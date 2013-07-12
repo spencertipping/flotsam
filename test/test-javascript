@@ -14,7 +14,7 @@ console.log('Flotsam: passed the test');
 
 for (var i = 0; i < 8; ++i) {
   var xs = [];
-  for (var j = 0, lj = Math.random() * Math.random() * 2000000; j < lj; ++j)
+  for (var j = 0, lj = Math.random() * Math.random() * 5000000; j < lj; ++j)
     xs.push((Math.random() < 0.5 ? 1 : -1) *
             Math.random() * Math.pow(2, Math.random() * 2048 - 1024 | 0));
 
