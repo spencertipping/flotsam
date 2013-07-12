@@ -1,0 +1,31 @@
+#!/bin/bash
+f=$(mktemp testXXXXXXXX.java)
+
+cat > $f <<eof
+import org.flotsam.Flotsam;
+import java.util.Random;
+
+public class ${f%.java} {
+  public static void main(final String[] args) {
+    final double[] xs = {0.0};
+    final Random   r  = new Random();
+
+    for (int i = 0; i < 1000000; ++i) {
+      xs[0] = r.nextDouble() * Math.pow(2.0, r.nextInt(2046) - 1023);
+
+      final double[] ys = Flotsam.decode(Flotsam.encode(xs));
+      if (ys[0] != xs[0])
+        throw new IllegalStateException(
+          "Flotsam failed to preserve the value of " + xs[0]
+        + " (returned " + ys[0] + " instead on iteration " + i + ")");
+    }
+
+    System.out.println("Flotsam: passed the test");
+  }
+}
+eof
+
+javac $f
+java ${f%.java}
+
+rm $f ${f%.java}.class org/flotsam/Flotsam.class

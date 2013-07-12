@@ -1,0 +1,58 @@
+#!/bin/bash
+f=$(mktemp "flotsam-test-XXXXXXXX")
+cat flotsam.js - <<eof >> $f
+for (var i = 0; i < 1000000; ++i) {
+  var n = Math.random() * Math.pow(2, Math.random() * 2048 - 1024 | 0);
+  if (Math.random() < 0.5) n = -n;
+  var m = flotsam.decode_single(flotsam.encode_single(n), 0);
+  if (m !== n)
+    throw new Error('Flotsam failed to preserve the value of ' + n
+                  + ' (returned ' + m + ' instead on iteration ' + i + ')');
+}
+
+console.log('Flotsam: passed the test');
+
+for (var i = 0; i < 8; ++i) {
+  var xs = [];
+  for (var j = 0, lj = Math.random() * Math.random() * 2000000; j < lj; ++j)
+    xs.push((Math.random() < 0.5 ? 1 : -1) *
+            Math.random() * Math.pow(2, Math.random() * 2048 - 1024 | 0));
+
+  console.log('\\ntest array with ' + xs.length + ' numbers');
+
+  if (i & 1) {
+    var t1             = +new Date;
+    var flotsam_string = flotsam.encode(xs);
+    var t2             = +new Date;
+    var json_string    = JSON.stringify(xs);
+    var t3             = +new Date;
+    var flotsam_decode = flotsam.decode(flotsam_string);
+    var t4             = +new Date;
+    var json_decode    = JSON.parse(json_string);
+    var t5             = +new Date;
+
+    console.log('JSON    generate/parse (ms): ' + (t3 - t2) + '/' + (t5 - t4));
+    console.log('Flotsam generate/parse (ms): ' + (t2 - t1) + '/' + (t4 - t3));
+    console.log('JSON    size: ' + json_string.length);
+    console.log('Flotsam size: ' + flotsam_string.length);
+  } else {
+    var t1             = +new Date;
+    var json_string    = JSON.stringify(xs);
+    var t2             = +new Date;
+    var flotsam_string = flotsam.encode(xs);
+    var t3             = +new Date;
+    var json_decode    = JSON.parse(json_string);
+    var t4             = +new Date;
+    var flotsam_decode = flotsam.decode(flotsam_string);
+    var t5             = +new Date;
+
+    console.log('JSON    generate/parse (ms): ' + (t2 - t1) + '/' + (t4 - t3));
+    console.log('Flotsam generate/parse (ms): ' + (t3 - t2) + '/' + (t5 - t4));
+    console.log('JSON    size: ' + json_string.length);
+    console.log('Flotsam size: ' + flotsam_string.length);
+  }
+}
+eof
+
+node $f
+rm $f

@@ -26,23 +26,6 @@ public abstract class Flotsam {
         BASE94_DECODE[i << 7 | j + 32] = base * j;
       base *= 94;
     }
-
-    // Quick sanity check
-    final double[] testNumbers =
-      {1.0, 2.0, -1.0, -2.0, Math.PI, Math.E,
-       1.0e100, 1.0e-100, -1.0e100, -1.0e-100,
-       Double.MAX_VALUE, Double.MIN_VALUE};
-
-    final double[] results = decode(encode(testNumbers));
-
-    for (int i = 0; i < testNumbers.length; ++i)
-      if (results[i] != testNumbers[i])
-        throw new IllegalStateException(
-          "Flotsam initialization: encoder failed self-check: "
-          + testNumbers[i] + " became " + results[i]
-          + " (bitwise difference: "
-          + Long.toString(Double.doubleToLongBits(testNumbers[i]), 2) + " -> "
-          + Long.toString(Double.doubleToLongBits(results[i]), 2)     + ")");
   }
 
   /**
