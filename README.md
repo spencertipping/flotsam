@@ -13,7 +13,38 @@ JSON    size: 101676722
 Flotsam size: 43524790
 ```
 
-Flotsam handles all floating-point values except for positive/negative infinity
-and NaN.
+Flotsam handles all floating-point values (including subnormal ones) except for
+positive/negative infinity and NaN.
 
 MIT license as usual.
+
+## Usage
+The Java and Javascript libraries each provide two functions, `encode()` and
+`decode()`, that convert between double arrays and strings. In the Java API,
+for example:
+
+```java
+double[] xs = ...;
+String encoded = org.flotsam.Flotsam.encode(xs);
+double[] ys = org.flotsam.Flotsam.decode(encoded);
+```
+
+The Javascript API is almost identical:
+
+```js
+var xs = [...];         // Float64Arrays also work
+var encoded = flotsam.encode(xs);
+var ys = flotsam.decode(encoded);
+```
+
+Flotsam uses the same format either way, so you can share encoded values across
+languages.
+
+## Sample encodings
+```
+           = 0
+/_         = 1
+O_         = -1
+0 jMb |8\G = 3.141592653589793
+0 _7z2bRx8 = 2.718281828459045
+```

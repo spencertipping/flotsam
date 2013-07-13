@@ -21,6 +21,12 @@ public class ${f%.java} {
     }
 
     System.out.println("Flotsam: passed the test");
+
+    final double[] tests =
+      {0.0, 1.0, -1.0, 3.141592653589793, 2.718281828459045};
+
+    for (final double d : tests)
+      System.out.println(Flotsam.encode(new double[] {d}) + " = " + d);
   }
 }
 eof

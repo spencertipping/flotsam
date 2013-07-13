@@ -52,6 +52,10 @@ for (var i = 0; i < 8; ++i) {
     console.log('Flotsam size: ' + flotsam_string.length);
   }
 }
+
+[0.0, 1.0, -1.0, Math.PI, Math.E].forEach(function (x) {
+  console.log(flotsam.encode_single(x) + ' = ' + x);
+});
 eof
 
 node $f
