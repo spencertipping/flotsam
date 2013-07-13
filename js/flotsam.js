@@ -49,7 +49,8 @@ for (var i = 1024, base = 1.0; i <  2047; ++i) float_powers[i] = base *= 2.0;
 for (var i = 1022, base = 1.0; i >= 1;    --i) float_powers[i] = base *= 0.5;
 
 // Same exponent, different interpretation.
-float_powers[0] = float_powers[1];
+float_powers[0]    = float_powers[1];
+float_powers[2047] = float_powers[2046];
 
 var mantissa_norm = float_powers[1023 + 52];
 
@@ -117,16 +118,17 @@ flotsam.encode_single = function (x) {
   // exponent to 1023 (the encoding of 0). Then we subtract off the implied
   // mantissa norm, at which point we have just the remaining bits that we can
   // access by casting to an integer or using FP modular arithmetic.
-  var mantissa = (x / float_powers[exponent] - (exponent ? 1 : 0))
-               * mantissa_norm;
+  var mantissa = exponent !== 0
+               ? (x * float_powers[2046 - exponent] - 1.0) * mantissa_norm
+               :  x * float_powers[2045]                   * mantissa_norm;
 
-  var result   = digits[(sign << 5 | exponent >> 6 & 0x1f)]
-               + digits[exponent & 0x3f];
+  var result   = digits[sign << 5 | exponent >> 6 & 0x1f]
+               + digits[            exponent      & 0x3f];
 
-  var d78 =  mantissa                        / 689869781056   | 0;
-  var d56 = (mantissa -= d78 * 689869781056) / 78074896       | 0;
-  var d34 = (mantissa -= d56 * 78074896    ) / 8836           | 0;
-  var d12 = (mantissa -= d34 * 8836        )                  | 0;
+  var d78 =  mantissa                        * (1.0 / 689869781056) | 0;
+  var d56 = (mantissa -= d78 * 689869781056) * (1.0 / 78074896)     | 0;
+  var d34 = (mantissa -= d56 * 78074896)     * (1.0 / 8836)         | 0;
+  var d12 = (mantissa -= d34 * 8836)                                | 0;
   return result + (digit_pairs[d12] + digit_pairs[d34]
                 +  digit_pairs[d56] + digit_pairs[d78]);
 };
