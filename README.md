@@ -15,3 +15,5 @@ Flotsam size: 43524790
 
 Flotsam handles all floating-point values except for positive/negative infinity
 and NaN.
+
+MIT license as usual.
