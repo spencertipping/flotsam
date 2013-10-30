@@ -40,6 +40,27 @@ var ys = flotsam.decode(encoded);
 Flotsam uses the same format either way, so you can share encoded values across
 languages.
 
+## 32-bit encoding
+This works identically to 64-bit float encoding, but uses only five bytes per
+float, and where applicable uses `float` arrays rather than `double`s:
+
+```java
+float[] xs = ...;
+String encoded = org.flotsam.Flotsam32.encode(xs);
+float[] ys = org.flotsam.Flotsam32.decode(encoded);
+```
+
+And in Javascript:
+
+```js
+var xs = [...];         // Float32Arrays also work
+var encoded = flotsam32.encode(xs);
+var ys = flotsam32.decode(encoded);
+```
+
+Numbers are internally represented as double-precision floats in Javascript, so
+you will observe a loss of precision if you use `flotsam32`.
+
 ## Sample encodings
 ```
            = 0

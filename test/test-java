@@ -3,30 +3,44 @@ f=$(mktemp testXXXXXXXX.java)
 
 cat > $f <<eof
 import org.flotsam.Flotsam;
+import org.flotsam.Flotsam32;
 import java.util.Random;
 
 public class ${f%.java} {
   public static void main(final String[] args) {
-    final double[] xs = {0.0};
-    final Random   r  = new Random();
+    final double[] xs  = {0.0};
+    final float[]  xsf = {0.0f};
+    final Random   r   = new Random();
 
     for (int i = 0; i < 1000000; ++i) {
-      xs[0] = r.nextDouble() * Math.pow(2.0, r.nextInt(2046) - 1023);
+      xs[0]  = r.nextDouble() * Math.pow(2.0, r.nextInt(2046) - 1023);
+      xsf[0] = r.nextFloat()  * (float) Math.pow(2.0, r.nextInt(254) - 127);
 
-      final double[] ys = Flotsam.decode(Flotsam.encode(xs));
+      final double[] ys  = Flotsam  .decode(Flotsam  .encode(xs));
+      final float[]  ysf = Flotsam32.decode(Flotsam32.encode(xsf));
+
       if (ys[0] != xs[0])
         throw new IllegalStateException(
           "Flotsam failed to preserve the value of " + xs[0]
         + " (returned " + ys[0] + " instead on iteration " + i + ")");
+
+      if (ysf[0] != xsf[0])
+        throw new IllegalStateException(
+          "Flotsam32 failed to preserve the value of " + xsf[0]
+        + " (returned " + ysf[0] + " instead on iteration " + i + ")");
     }
 
     System.out.println("Flotsam: passed the test");
 
     final double[] tests =
       {0.0, 1.0, -1.0, 3.141592653589793, 2.718281828459045};
-
     for (final double d : tests)
       System.out.println(Flotsam.encode(new double[] {d}) + " = " + d);
+
+    final float[] tests32 =
+      {0.0f, 1.0f, -1.0f, 3.141592653589793f, 2.718281828459045f};
+    for (final float f : tests32)
+      System.out.println(Flotsam32.encode(new float[] {f}) + " = " + f);
   }
 }
 eof
@@ -34,4 +48,4 @@ eof
 javac $f
 java ${f%.java}
 
-rm $f ${f%.java}.class org/flotsam/Flotsam.class
+rm $f ${f%.java}.class org/flotsam/Flotsam{,32}.class
